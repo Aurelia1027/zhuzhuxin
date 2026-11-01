@@ -21,7 +21,7 @@
 | Action Bridge | One existing FIFO bridge; real arrival and animation completion; cancellation and duplicate protection |
 | Custom character / 自定义人设 | Private owner-controlled Markdown, official fallback, strict file validation and opt-in |
 
-The Week 04 complex Qwen command passed one real validation with the final Desk + ListenRap state; that is not broad semantic coverage or a full uninterrupted motion recording. The newer expression field has Mock coverage only. No new paid calls were made for this release.
+The Week 04 complex Qwen command passed one real validation with the final Desk + ListenRap state; that is not broad semantic coverage or a full uninterrupted motion recording. One later owner-authorized public Qwen chat + Wave + happy-expression sample passed. This update made no further paid calls.
 
 New local controls include toy-style sitting/standing, open arms, nod/shake head, turn around, return to the Bed stop facing the camera, a small jump, silent looping dance, and seated dozing/waking. The seated hip texture stretch was accepted by the owner. Newer motions are preview features and have not all passed visual acceptance. Sleep is seated dozing, not lying under a blanket. Read, HugShark, cabinet-door animation, audio playback, arbitrary navigation and Rain remain unimplemented. ListenRap is silent. The mobile split layout keeps the character visible while chatting; real iOS/Android keyboards and touch still need validation.
 

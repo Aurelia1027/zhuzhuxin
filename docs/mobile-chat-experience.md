@@ -59,3 +59,8 @@ visualViewport.height/offsetTop用于键盘缩小或上移的可见区域；没�
 5. 等用户确认手机版本后再推送/部署到原站点；生产当前仍运行上个版本。
 
 参考：[VisualViewport](https://developer.mozilla.org/en-US/docs/Web/API/VisualViewport)、[safe-area env](https://developer.mozilla.org/en-US/docs/Web/CSS/env)、[preventScroll focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus)。
+
+## 2026-11-01 发布更新
+
+用户授权后，本手机适配已随单角色动作一并发布到原Netlify站点，部署ID为6ae751dfa077966bf9d86f22，代码提交d6be7df。发布前类型/构建和84项离线测试通过。仍未取得真实iOS/Android键盘验收证据；新增动作并非全部视觉验收通过。当前生产Qwen沿用此前授权保持开启，发布没有新增付费测试。
+公网复核：刷新后房间与角色Idle正常，聊天面板显示Qwen AI、人设v0.2；390×844下同屏显示角色与输入框，未发送消息。线上截图：live-390x844.png、live-desktop.png。首次约50MB角色资源下载曾中断，刷新后成功，加载速度仍是限制。

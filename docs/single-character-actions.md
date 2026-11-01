@@ -120,3 +120,16 @@
 以上为代码接入完成，未运行本轮测试、TypeScript检查、构建或浏览器动作验收，未确认实际跳跃落地、舞蹈肩袖和睡眠家具接触效果。既有“跳起来应拒绝”的测试期望已过时，后续恢复测试时需要更新为本地jump；不能声称当前完整测试通过。
 
 模型、Blender、骨骼、权重、家具布局、官方人设、QwenProvider、Functions、密钥及部署配置未修改。已先备份被改代码。手机聊天布局文件未修改。当前只在本地，不推送或部署；朋友访问原Netlify网址仍是旧版本。用户确认发布后沿用原站点，无需更换分享链接。
+## 2026-11-01 已授权发布
+
+用户明确回复“你更新吧”，授权将本轮手机适配与单角色动作更新到原GitHub和Netlify。
+
+- 已推送代码提交：d6be7df3fc68589720169215605268870aca39e8；main与feat/mobile-chat-actions-release均正常快进，无force push。
+- 原站点：https://spontaneous-licorice-fbdd12.netlify.app/ 。部署ID：6ae751dfa077966bf9d86f22。页面+1个lumi Function实际部署，没有新建站点。
+- 发布前生产构建与类型检查通过；84项离线测试通过。仅修正两处已经过时的本地“跳起来应拒绝”断言。没有新增完整动作视觉验收或付费Qwen测试。
+- 独立依赖打包修复了最初联接依赖造成的人设路径污染；有问题的包未上传。最终27个前端文件、80个Function文件检查通过：0个已知密钥值匹配、无.env/备份/源模型工程，官方原稿字节一致，运行GLB仅cozy-room、shark、shuibuxin-walk三个。
+- 公网GET首页200，加载新资源index-BuOniT9H.js；health.paidChat=configured；character.aiAvailable=true、version=0.2、sha256=7c48e1f06fe2312dc9906622fefc6c7e8ec5affa8454f33c8bed9ed239d4ffc7。GET action-intent返回405，路由存在且要求POST。未发送真实聊天。
+- 正式模型、Blender源文件、官方原稿、QwenProvider、Functions源码及netlify.toml相对上次生产代码没有变更。此前已授权的生产Qwen开关保持开启。
+- 公网浏览器首次50MB角色GLB下载Failed to fetch；刷新后实际显示3D房间、家具和猪猪心Idle，聊天面板为Qwen AI，原稿v0.2。390×844手机尺寸下角色与聊天上下分区同时可见，只有一个Canvas；截图见docs/mobile-chat-experience/live-390x844.png和live-desktop.png。本次没有发送消息，不是新的真实付费对话验收。首次大模型加载仍慢，手机真实键盘及各新增动作完整视觉验收仍待完成。
+
+上文“未发布/未构建”的文字是开发阶段记录，本节为后续发布状态。
