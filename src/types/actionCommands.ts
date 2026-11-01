@@ -34,11 +34,17 @@ export function parseActionPlan(value:unknown):ActionPlan {
  }
  return structuredClone(value)
 }
-export type LocalIntent={kind:'plan';plan:ActionPlan}|{kind:'stop'}|{kind:'unsupported'}|{kind:'chat'}
+export type LocalIntent={kind:'plan';plan:ActionPlan}|{kind:'root';command:import('../characters/characterRootActions').RootActionCommand}|{kind:'pose';action:'jump'|'dance'|'sleep'|'wake_up'}|{kind:'stop'}|{kind:'unsupported'}|{kind:'chat'}
 export function recognizeLocal(input:string):LocalIntent {
  const text=input.trim().replace(/[，,。！!？?\s]/g,'').replace(/^(猪猪心|朱朱|猪猪)[啊呀]?/,'').replace(/^(请|麻烦你|帮我)/,'').replace(/(吧|一下|好吗|好不好)$/,'').toLowerCase()
  if(/^(停下来|停一下|停|别动了|停止|取消后续动作|取消动作)$/.test(text))return{kind:'stop'}
- if(/^(转身|转个身|跳起来|跳一下|跳|坐下|坐|读书|看书|跳舞|跑起来|跑步)$/.test(text))return{kind:'unsupported'}
+ if(/^(转身|转个身|转过去|转过身去|转半圈)$/.test(text))return{kind:'root',command:{type:'turn_around'}}
+ if(/^(回到我面前|回我面前|回到我这边|过来找我|回到镜头前)$/.test(text))return{kind:'root',command:{type:'come_to_me'}}
+ if(/^(跳起来|跳一下|跳个高|跳)$/.test(text))return{kind:'pose',action:'jump'}
+ if(/^(跳舞|跳个舞|跳一段舞)$/.test(text))return{kind:'pose',action:'dance'}
+ if(/^(睡觉|去睡觉|去床边睡觉|去打盹|打个盹|打盹)$/.test(text))return{kind:'pose',action:'sleep'}
+ if(/^(醒来|醒醒|起床|睡醒了)$/.test(text))return{kind:'pose',action:'wake_up'}
+ if(/^(坐下|坐|读书|看书|跑起来|跑步)$/.test(text))return{kind:'unsupported'}
  const move=text.match(/^(?:走到|走去|去|到)(?:书桌|桌子)(?:旁边|旁|边)?(听(?:会|一会)?(?:rap|歌))?$/)
  if(move)return{kind:'plan',plan:{commands:[{type:'walk_to_desk'},...(move[1]?[{type:'listen_rap' as const}]:[])]}}
  if(/^(?:回|回到|走到|去)(?:床边|床旁|床旁边)$/.test(text))return{kind:'plan',plan:{commands:[{type:'walk_to_bed'}]}}

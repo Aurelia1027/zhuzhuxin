@@ -10,6 +10,9 @@ export function FurnitureInteractionPanel(){
    <button type="button" disabled={state.sharkMoving} onClick={()=>roomInteractions.request('shark')}>{state.sharkRaised?'放回鲨鱼':'浮起鲨鱼'}</button>
    <button type="button" disabled={busy} onClick={()=>roomInteractions.request('bed')}>走到床边</button>
    <button type="button" disabled={busy} onClick={()=>roomInteractions.request('desk')}>去书桌挥手</button>
+   <button type="button" disabled={busy} onClick={()=>roomInteractions.request('bedSit')}>床边坐下</button>
+   <button type="button" disabled={busy} onClick={()=>roomInteractions.request('bedSleep')}>床边打盹</button>
+   <button type="button" disabled={busy} onClick={()=>roomInteractions.request('deskDance')}>去书桌跳舞</button>
    <button type="button" disabled={state.lampMoving} aria-pressed={state.deskLampOn} onClick={()=>roomInteractions.request('deskLamp')}>{state.deskLampOn?'关闭桌灯':'打开桌灯'}</button>
   </div>
   <p role="status" data-testid="furniture-status">{state.message}</p>

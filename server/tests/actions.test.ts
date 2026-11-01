@@ -17,7 +17,7 @@ const tick=()=>new Promise<void>(resolve=>queueMicrotask(resolve))
 const status=(action:CharacterActionCommand['action']='Idle',moving=false,dock:'Bed'|'Desk'='Bed')=>({action,moving,dock,phase:'playing' as const,bones:12})
 test('precise local commands; mixed chat, negation and quotation are never keyword executed',()=>{
  for(const s of ['挥挥手','去书桌','回床边','听Rap','去书桌听Rap'])assert.equal(recognizeLocal(s).kind,'plan')
- assert.equal(recognizeLocal('停下来').kind,'stop');assert.equal(recognizeLocal('跳起来').kind,'unsupported')
+ assert.equal(recognizeLocal('停下来').kind,'stop');assert.equal(recognizeLocal('跳起来').kind,'pose')
  for(const s of ['别去书桌','我今天很难过，去书桌陪我聊聊吧','你会挥手吗','他说“去书桌”','我喜欢听Rap'])assert.equal(recognizeLocal(s).kind,'chat')
 })
 test('unknown actions/locations, extra properties and inconsistent destinations fail closed',()=>{

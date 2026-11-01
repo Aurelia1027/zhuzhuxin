@@ -50,6 +50,8 @@ export const chatStore = {
       const id=crypto.randomUUID();let reply='嗯，收到啦。我会按顺序做，还没完成哦。'
       try{
         if(local.kind==='plan')actionBridge.submit(local.plan,id)
+        else if(local.kind==='pose'){actionBridge.requestPose(local.action);reply=local.action==='sleep'?'嗯，我先去床边坐下，闭眼打个盹。':local.action==='wake_up'?'好，我醒过来。':'好，我会按顺序做。'}
+          else if(local.kind==='root'){actionBridge.submitRoot(local.command,id);reply=local.command.type==='come_to_me'?'嗯，我先回床边，再转过来面向你。':'好，我转个身。'}
         else if(local.kind==='stop')reply=actionBridge.stop()
         else reply='这个动作我还没学会…可以挥手、听 Rap，或走到床边和书桌旁。'
       }catch(error){reply=error instanceof Error?error.message:'这次动作没有执行。'}

@@ -18,7 +18,8 @@
     "test:netlify": "node --experimental-strip-types --test server/tests/netlify.test.ts",
     "release:audit": "node scripts/release-audit.mjs",
     "release:prepare": "node scripts/prepare-release.mjs",
-    "test": "npm run test:character && npm run test:qwen && npm run test:actions && npm run test:expressions && npm run test:furniture && npm run test:release && npm run test:netlify"
+    "test": "npm run test:character && npm run test:qwen && npm run test:actions && npm run test:expressions && npm run test:furniture && npm run test:release && npm run test:netlify && npm run test:posture",
+    "test:posture": "node --experimental-strip-types --test server/tests/posture.test.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",

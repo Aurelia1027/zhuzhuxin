@@ -1,9 +1,10 @@
 import { actionBridge } from '../characters/actionBridge.ts'
 import type { ActionPlan } from '../types/actionCommands.ts'
 
-export type FurnitureInteraction='shark'|'bed'|'desk'|'deskLamp'
+export type FurnitureInteraction='shark'|'bed'|'desk'|'deskLamp'|'bedSit'|'bedSleep'|'deskDance'
 interface BridgePort {
  submit:(plan:ActionPlan,id?:string)=>boolean
+ requestPose?:(type:'sit_down'|'sleep'|'dance')=>void
  getSnapshot:()=>{pending:number;message:string}
  subscribe:(listener:()=>void)=>()=>void
 }
@@ -27,7 +28,16 @@ export function createRoomInteractions(bridge:BridgePort){
   }
   if(!state.characterReady){update({message:'猪猪心还在加载，稍等一下。'});return false}
   if(state.moving||bridge.getSnapshot().pending>0||state.activeFurniture){update({message:'猪猪心正在忙，完成当前动作后再点。'});return false}
-  update({activeFurniture:id,message:id==='bed'?'准备回到床边。':'准备去书桌旁打招呼。'})
+  const target=id==='desk'||id==='deskDance'?'desk':'bed'
+  update({activeFurniture:target,message:id==='bedSit'?'准备走近床沿坐下。':id==='bedSleep'?'准备去床边坐下打盹。':id==='deskDance'?'准备走到书桌旁再跳舞。':id==='bed'?'准备回到床边。':'准备去书桌旁打招呼。'})
+  if(id==='bedSit'||id==='bedSleep'||id==='deskDance'){
+   if(!bridge.requestPose){update({activeFurniture:null,message:'当前角色控制器尚未提供这个家具动作。'});return false}
+   try{
+    if(id==='deskDance'){bridge.submit({commands:[{type:'walk_to_desk'}]});bridge.requestPose('dance')}
+    else bridge.requestPose(id==='bedSleep'?'sleep':'sit_down')
+    return true
+   }catch{update({activeFurniture:null,message:'这次家具动作没有开始，请稍后再试。'});return false}
+  }
   try{return bridge.submit({commands:[{type:id==='bed'?'walk_to_bed':'walk_to_desk',followUpAction:id==='bed'?'idle':'wave'}]})}
   catch{update({activeFurniture:null,message:'这次互动没有开始，请稍后再试。'});return false}
  }

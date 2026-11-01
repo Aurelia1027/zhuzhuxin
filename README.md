@@ -4,7 +4,7 @@
 
 一个可以让自己放松下来的 3D 房间：陪猪猪心挥手、听 Rap、在床边和书桌间走走，也可以 Fork 一份属于自己的角色性格。
 
-**[Live Demo](https://spontaneous-licorice-fbdd12.netlify.app/)** · Existing static game. Netlify Qwen Functions are implemented on the Week 07 branch; production AI remains disabled pending owner setup and authorization.
+**[Live Demo](https://spontaneous-licorice-fbdd12.netlify.app/)** · Hosted on the existing Netlify site with server-side Qwen chat enabled by the owner. No API key is sent to visitors; availability depends on provider limits.
 
 ![Lumi Room — Dark Cozy Bedroom](docs/week05-furniture/final.jpg)
 
@@ -23,7 +23,15 @@
 
 The Week 04 complex Qwen command passed one real validation with the final Desk + ListenRap state; that is not broad semantic coverage or a full uninterrupted motion recording. The newer expression field has Mock coverage only. No new paid calls were made for this release.
 
-Sit, Read, HugShark, cabinet-door animation, audio playback, arbitrary navigation and Rain are **not implemented**. ListenRap is a silent original rhythm animation. Mobile narrow-screen clicks were checked; real phones/WeChat browsers still need validation. Production public AI remains disabled until spend, access and compliance controls are ready; Demo and local actions remain usable.
+New local controls include toy-style sitting/standing, open arms, nod/shake head, turn around, return to the Bed stop facing the camera, a small jump, silent looping dance, and seated dozing/waking. The seated hip texture stretch was accepted by the owner. Newer motions are preview features and have not all passed visual acceptance. Sleep is seated dozing, not lying under a blanket. Read, HugShark, cabinet-door animation, audio playback, arbitrary navigation and Rain remain unimplemented. ListenRap is silent. The mobile split layout keeps the character visible while chatting; real iOS/Android keyboards and touch still need validation.
+
+## Mobile and new actions / 手机与新增动作
+
+![Mobile chat: visible character and compact bottom panel](docs/mobile-chat-experience/390x844.png)
+
+On screens up to 760px wide, chat uses a compact bottom panel (or a side panel in landscape) while retaining the existing Canvas. Input and send controls remain visible; advanced settings are collapsible. See [mobile acceptance](docs/mobile-chat-experience.md).
+
+The action panel contains the new motion buttons. Exact local commands include `转身`, `回到我面前`, `跳起来`, `跳舞`, `睡觉`, and `醒来`. These execute locally without a Qwen request. Return-to-me uses the validated route back to the Bed stop, then faces the current camera. Remote AI is only allowed to use its previously verified action whitelist. Furniture controls add sit/doze at Bed and walk to Desk before dancing. See [motion status and limitations](docs/single-character-actions.md).
 
 ## Stack & architecture / 技术架构
 
@@ -63,7 +71,7 @@ npm run preview
 npm run release:audit
 ```
 
-Production output is dist/. `npm run serve:dialogue` starts the standalone same-origin API for a future reverse proxy; `npm run preview` is a local preview, not an internet deployment service. This repository is not yet deployed.
+Production output is dist/. `npm run serve:dialogue` starts the standalone same-origin API for a future reverse proxy; `npm run preview` is a local preview, not an internet deployment service. The existing public site is deployed with Netlify Functions.
 
 ## Configure your own Qwen / 安全配置
 

@@ -1,7 +1,7 @@
 import { AnimationClip, Bone, Object3D, PropertyBinding, Quaternion, QuaternionKeyframeTrack, Vector3, VectorKeyframeTrack } from 'three'
 
 export const characterActions = ['Idle', 'Wave', 'ListenRap', 'Walk'] as const
-export type CharacterActionName = typeof characterActions[number]
+export type CharacterActionName = typeof characterActions[number] | import('./characterPosture').PostureAction | import('./characterGestures').GestureAction | import('./characterRootActions').RootActionName | import('./characterActivities').ActivityAction
 export interface CharacterActionCommand { action: CharacterActionName; sequence: number; destination?: 'Desk' | 'Bed' }
 export const characterPlacement = { position: [-1.15, .005, .85] as [number, number, number], height: 1.45, yaw: -.64 }
 type AxisData = Record<string, {primary: number[]; sway: number[]; yaw: number[]}>

@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { actionBridge } from './characters/actionBridge'
 import { roomInteractions } from './interactions/roomInteractions'
 import { FurnitureInteractionPanel } from './components/FurnitureInteractionPanel'
@@ -26,6 +27,10 @@ export default function App() {
     actionBridge.submit({commands:[{type:destination==='Desk'?'walk_to_desk':'walk_to_bed'}]})
   },[])
   const requestCharacterAction = useCallback((action:CharacterActionName)=>{
+    if(action==='Jump'||action==='Dance'||action==='Sleep'||action==='WakeUp'){actionBridge.requestPose(action==='Jump'?'jump':action==='Dance'?'dance':action==='Sleep'?'sleep':'wake_up');return}
+    if(action==='TurnAround'||action==='ComeToMe'){actionBridge.submitRoot({type:action==='TurnAround'?'turn_around':'come_to_me'});return}
+    if(action==='Nod'||action==='ShakeHead'){actionBridge.requestPose(action==='Nod'?'nod':'shake_head');return}
+    if(action==='SitDown'||action==='StandUp'||action==='OpenArms'){actionBridge.requestPose(action==='SitDown'?'sit_down':action==='StandUp'?'stand_up':'open_arms');return}
     actionBridge.submit({commands:[{type:action==='Wave'?'wave':action==='ListenRap'?'listen_rap':'idle'}]})
   },[])
   const [mood, setMood] = useState<Mood>('evening')
@@ -83,7 +88,8 @@ export default function App() {
           <div className="lamp-setting"><Icon name="lamp" size={21} /><div><strong>暖色台灯</strong><p>{lampOn ? '留一盏灯给自己' : '让蓝色光环接管夜晚'}</p></div><button type="button" role="switch" aria-checked={lampOn} aria-label="台灯开关" className={`switch ${lampOn ? 'on' : ''}`} onClick={toggleLamp}><span /></button></div>
         </section>
         <section className="view-section" aria-label="视角切换"><div className="section-label"><span>换个角度</span><small>02 / PERSPECTIVE</small></div><div className="view-options" role="group" aria-label="观察视角"><button type="button" aria-pressed={view === 'overview'} className={view === 'overview' ? 'selected' : ''} onClick={() => changeView('overview')}>房间全景</button><button type="button" aria-pressed={view === 'inside'} className={view === 'inside' ? 'selected' : ''} onClick={() => changeView('inside')}>走进房间 <Icon name="arrow" size={14} /></button></div></section>
-        <CharacterActionPanel action={characterPlayback?.action ?? 'Idle'} ready={characterPlayback !== null} moving={characterPlayback?.moving} dock={characterPlayback?.dock} onMove={requestCharacterMove} onAction={requestCharacterAction} />
+        <CharacterActionPanel action={characterPlayback?.action ?? 'Idle'} ready={characterPlayback !== null} moving={characterPlayback?.moving} dock={characterPlayback?.dock} posture={characterPlayback?.posture} transitioning={characterPlayback?.transitioning} onMove={requestCharacterMove} onAction={requestCharacterAction} />
+        {import.meta.env.DEV&&<output hidden data-testid="character-debug-pose">{JSON.stringify(characterPlayback)}</output>}
         <FurnitureInteractionPanel />
         <section className="object-card" aria-live="polite" aria-label="物品详情"><div className="object-card-top"><span className="eyebrow">{selected ? 'SELECTED OBJECT' : 'MEET YOUR ROOMMATE'}</span><span className="object-star">✳</span></div><span className="object-tag">{item.tag}</span><h3>{item.name}</h3><p>{item.description}</p><div className="object-detail"><span />{item.detail}</div></section>
         <div className="object-shortcuts" aria-label="核心家具"><span className="eyebrow">EXPLORE THE DETAILS</span><div>{featuredItems.map((id, index) => <button type="button" key={id} aria-pressed={selected === id} className={selected === id ? 'selected' : ''} onClick={() => setSelected(id)}><small>0{index + 1}</small>{roomItems[id].name}<Icon name="arrow" size={13} /></button>)}</div></div>

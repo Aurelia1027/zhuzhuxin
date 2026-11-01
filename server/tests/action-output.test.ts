@@ -63,7 +63,7 @@ test('required local inputs remain deterministic; mixed compound is delegated, n
  const inputs:[string,string[]][]=[['挥挥手',['wave']],['去书桌',['walk_to_desk']],['回床边',['walk_to_bed']],['听 Rap',['listen_rap']],['去书桌听 Rap',['walk_to_desk','listen_rap']]]
  for(const [text,types] of inputs){const local=recognizeLocal(text);assert.equal(local.kind,'plan');if(local.kind==='plan')assert.deepEqual(local.plan.commands.map(c=>c.type),types)}
  for(const text of [request.message,'先去书桌，再听 Rap，等我来找你','今天有点累'])assert.equal(recognizeLocal(text).kind,'chat')
- assert.equal(recognizeLocal('跳起来').kind,'unsupported')
+ assert.equal(recognizeLocal('跳起来').kind,'pose')
 })
 
 test('mocked complex output reaches bridge and waits for real arrival before follow-up',async()=>{
