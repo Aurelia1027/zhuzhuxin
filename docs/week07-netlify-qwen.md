@@ -1,6 +1,6 @@
 # Week 07 — Netlify Functions + Qwen 最小可用接入
 
-2026-11-01。开发分支：`feat/week07-netlify-qwen`。目标站点保持 `https://spontaneous-licorice-fbdd12.netlify.app/`。已通过 CLI 部署到现有生产站点，保持真实付费关闭；没有执行真实 Qwen 请求。
+2026-11-01。开发分支：`feat/week07-netlify-qwen`。目标站点保持 `https://spontaneous-licorice-fbdd12.netlify.app/`。已通过 CLI 部署到现有生产站点；关闭模式验收后，所有者确认百炼硬停并授权开启，已完成 1 次真实 Qwen 联调，未重试。
 
 ## 已实现
 
@@ -52,7 +52,7 @@ CLI 备选：在干净的仓库检出目录执行 `npx netlify-cli@27.16.1 login
 - `netlify-cli@27.16.1 build --offline`：通过，实际打包 lumi Function。
 - CLI `functions:serve --offline --port 9999`：真实本机请求 health 200/paidChat disabled；character 200/v0.2/aiAvailable false；Demo 200；action-intent AI 503 PUBLIC_AI_DISABLED。
 - Mock 覆盖：完整人设、单次 Qwen transport、动作及表情、AJV 拒绝未知动作、JSON/SSE 兼容、输入/Token/历史限制、三个付费入口共用实例限流、并发释放、取消、错误脱敏、429/额度错误、本地 Demo 回退；用既有 Bridge 的真实 observe 完成信号测试 Walk 后 ListenRap。
-- 原有动作、表情、家具回归测试通过。真实 Netlify 生产 Function 与浏览器 Demo/3D/鲨鱼互动验收通过；真实 Qwen 联调尚未授权执行。
+- 原有动作、表情、家具回归测试通过。真实 Netlify 生产 Function 与浏览器 Demo/3D/鲨鱼互动验收通过；其后已获授权并完成 1 次真实 Qwen 联调，结果见末节。
 
 ## 官方参考
 
@@ -61,9 +61,9 @@ CLI 备选：在干净的仓库检出目录执行 `npx netlify-cli@27.16.1 login
 - [Netlify Function 打包配置](https://docs.netlify.com/build/functions/configuration/)
 - [百炼错误码](https://help.aliyun.com/en/model-studio/error-code)
 
-**当前生产付费状态：关闭。所有者已在 Netlify 配置服务端 Key，CLI 授权已完成；尚待确认百炼硬停并明确授权生产开启及一次真实联调。**
+**当前生产付费状态：开启。所有者已确认百炼达到预算停止服务，并明确授权正式开启和 1 次真实联调；本次联调通过，未重试。**
 
-## 已完成的生产部署与公网验收
+## 先前完成的关闭模式部署与公网验收
 
 - 站点 ID：849a5338-c73d-47f2-a3db-d708b308af5c；未创建第二个站点。
 - 部署 ID：6ae6ede1b22f701b216e6500；[部署记录](https://app.netlify.com/projects/spontaneous-licorice-fbdd12/deploys/6ae6ede1b22f701b216e6500)。实际上传24个静态文件及1个 lumi Function。
@@ -75,4 +75,15 @@ CLI 备选：在干净的仓库检出目录执行 `npx netlify-cli@27.16.1 login
 - 公网浏览器：3D房间、床、鞋柜、书桌、鲨鱼和猪猪心显示；角色Idle；聊天显示Demo Mode且Qwen选项禁用；“你好”收到明确标注Demo的预设回复。鲨鱼浮起交互完成；浏览器warning/error日志为空。截图保存在本地D:/pythonProject11/lumi-room-netlify-demo-live.png。
 - 25个保护文件（官方原稿、GLB、Blender工程、既有骨骼/动画/Action Bridge及家具逻辑等）哈希复核一致。
 - 本次部署使用部署级PUBLIC_QWEN_ENABLED=false覆盖。后续开启需要一次新的部署，移除该false覆盖或明确使用PUBLIC_QWEN_ENABLED=true；单改站点变量不能证明旧部署已开启。
-- 当前可以分享3D游戏及Demo；尚不能宣称完整AI聊天开放。等待所有者授权一次真实Qwen联调，通过后还须确认聊天UI标签为Qwen AI、助手消息为AI生成而非Demo。
+- 上述为开启前的验收记录；最新生产状态和真实测试结果见下节。
+## 已授权开启与唯一一次真实 Qwen 联调（2026-11-01）
+
+- 所有者回复“确认硬停，授权开启并测试 1 次”，授权内容同时包含正式开放访客调用、完整v0.2人设及默认房间上下文、无历史、600输出tokens上限、失败不重试并关闭。
+- 启用部署：6ae6efee99680016471f8816；[部署记录](https://app.netlify.com/projects/spontaneous-licorice-fbdd12/deploys/6ae6efee99680016471f8816)，同一站点，同一已验收代码，部署级 PUBLIC_QWEN_ENABLED=true。
+- 只读公网复核：health.paidChat=configured；character.aiAvailable=true；人设仍v0.2，sha256仍为7c48e1f06fe2312dc9906622fefc6c7e8ec5affa8454f33c8bed9ed239d4ffc7。
+- 在浏览器刷新以清空历史，打开聊天，确认自动选择 Qwen AI。仅发送一次授权测试：“今天有点累，陪我聊两句，也朝我挥挥手吧。”；没有手动或自动重试，也没有额外发起付费API抓包请求。
+- 实际回复：“你来啦，等你好久了呢...”。界面显示“猪猪心 · AI 生成”，保持Qwen AI模式，没有出现Demo回退。
+- 既有Action Bridge实际反馈“挥手完成 · 待执行 0”；表情面板选中“开心微笑”，并启用“跟随聊天”。3D房间和人物继续显示；浏览器error/warn日志为空。
+- 证明截图：D:/pythonProject11/lumi-room-qwen-live-accepted.png。未记录Key、完整Prompt或私人聊天。实际Token和计费金额未在生产浏览器中暴露，本次没有测量，费用以百炼账单为准。
+- 结论：这1个真实对话+挥手+表情样例通过，可以分享现有网址给朋友使用真实AI聊天；不代表所有复杂语义、手机或网络环境均已验收。无需额外Netlify登录授权，也无需先连接GitHub。
+- 当前按所有者授权保持生产Qwen开启。基础限流仍仅限热实例；费用硬停依赖所有者已确认的百炼后台设置。要停止公网付费聊天，重新部署并设置PUBLIC_QWEN_ENABLED=false。
