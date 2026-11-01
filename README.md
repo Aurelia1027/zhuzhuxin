@@ -4,7 +4,7 @@
 
 一个可以让自己放松下来的 3D 房间：陪猪猪心挥手、听 Rap、在床边和书桌间走走，也可以 Fork 一份属于自己的角色性格。
 
-**Live Demo: Coming Soon** · Website deployment is not part of this release.
+**[Live Demo](https://spontaneous-licorice-fbdd12.netlify.app/)** · Existing static game. Netlify Qwen Functions are implemented on the Week 07 branch; production AI remains disabled pending owner setup and authorization.
 
 ![Lumi Room — Dark Cozy Bedroom](docs/week05-furniture/final.jpg)
 
@@ -78,7 +78,7 @@ CHARACTER_CUSTOM_ENABLED=false
 
 Restart the local server after changing environment variables. Requests may incur your own provider charges; no author-owned credentials or unlimited free AI access are supplied. Default .env.example disables paid requests. Never send keys to the project author, commit them, or put them in browser code, screenshots or issues. Use provider-side limits. The proposed personal RMB50 budget has **not** been implemented as a persistent monetary cap in this GitHub-only release.
 
-`NODE_ENV=production` deliberately closes paid AI routes even if a paid key is misconfigured. Friends-only paid hosting and reliable spending controls are future work; do not bypass the gate for a public deployment. Demo Mode still works. See [SECURITY.md](SECURITY.md).
+The original Node HTTP service keeps its production paid-route gate. The Netlify Functions adapter uses the separate, explicit server-side `PUBLIC_QWEN_ENABLED` switch (default false), `DASHSCOPE_API_KEY`, bounded input/output and best-effort per-instance rate limits. Production use depends on owner-confirmed provider-side hard stop; no Redis or application monetary budget is implemented. See [Netlify setup and test results](docs/week07-netlify-qwen.md) and [SECURITY.md](SECURITY.md).
 
 ## How to Customize Your Character
 

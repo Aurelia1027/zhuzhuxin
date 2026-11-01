@@ -27,7 +27,7 @@ export function ChatPanel() {
     if (!open) return
     const controller = new AbortController()
     setMetadataError('')
-    void getCharacterMetadata(controller.signal).then(setMetadata).catch(error => {
+    void getCharacterMetadata(controller.signal).then(value=>{setMetadata(value);chatStore.syncAvailability(value.aiAvailable)}).catch(error => {
       if (!controller.signal.aborted) setMetadataError(error instanceof Error ? error.message : '规则加载失败。')
     })
     input.current?.focus()
@@ -53,7 +53,7 @@ export function ChatPanel() {
     {open && <section id="character-chat" className="character-chat" role="region" aria-labelledby="chat-title" onKeyDown={event => { if (event.key === 'Escape') close() }}>
       <header className="chat-header"><div><span className="chat-eyebrow">LUMI ROOM · CHARACTER LAB</span><h2 id="chat-title">{characterIdentity.displayName} <span>{chat.mode === 'ai' ? 'Qwen AI' : 'Demo Mode'}</span></h2></div><button type="button" aria-label="关闭聊天" onClick={close}>×</button></header>
       <p className="chat-disclaimer">{chat.mode === 'ai' ? '虚拟角色扮演 · Qwen AI 生成，不代表现实人物本人。' : '虚拟角色扮演 · 预设测试回复，非真实 AI 生成。'}</p>
-      <div className="chat-rule-status" role="status">{metadataError || (rules ? `角色规则 v${rules.version} · 服务端加载` : '正在检查角色规则…')}</div>
+      <div className="chat-rule-status" role="status">{metadataError ? '角色服务暂不可用 · 本地 Demo 预设仍可使用' : rules ? `角色规则 v${rules.version} · 服务端加载` : '正在检查角色规则…'}</div>
       <label className="chat-rule-status">对话模式 <select aria-label="对话模式" value={chat.mode} disabled={chat.pending} onChange={event => chatStore.setMode(event.target.value as 'demo' | 'ai')}><option value="demo">Demo · 离线演示</option><option value="ai" disabled={!metadata?.aiAvailable}>Qwen AI{!metadata?.aiAvailable && ' · 尚未启用'}</option></select></label>
       <details className="chat-relationship"><summary>相处方式 · {chat.relationship.mode === 'rules-default' ? '原稿默认' : '用户自定义'}</summary>
         <label>关系模式<select aria-label="关系模式" disabled={chat.pending} value={relationshipMode} onChange={event => { setRelationshipMode(event.target.value as typeof relationshipMode); setRelationshipFeedback('') }}><option value="rules-default">遵循原稿第 06 节</option><option value="user-defined">由我指定相处方式</option></select></label>
@@ -69,7 +69,7 @@ export function ChatPanel() {
       {(import.meta as ImportMeta & {env?:{DEV?:boolean}}).env?.DEV && chat.apiMetrics && <details><summary>API 用量（开发）</summary><pre>{JSON.stringify(chat.apiMetrics,null,2)}</pre></details>}
       <details className="chat-expressions"><summary>猪猪心表情</summary><CharacterExpressionControls /></details>
       {chat.error && <p className="chat-error" role="alert">{chat.error}</p>}
-      <form className="chat-composer" onSubmit={event => { void send(event) }}><label htmlFor="chat-message">发送消息</label><textarea ref={input} id="chat-message" aria-label="聊天消息" rows={2} maxLength={2000} value={draft} disabled={chat.pending} onChange={event => setDraft(event.target.value)} placeholder="说点什么…" onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(event) } }} /><div><small>Enter 发送 · Shift+Enter 换行</small><button type="submit" disabled={chat.pending || !draft.trim()}>发送 / 重试</button>{chat.pending && <button type="button" onClick={() => chatStore.cancel()}>停止生成</button>}</div></form>
+      <form className="chat-composer" onSubmit={event => { void send(event) }}><label htmlFor="chat-message">发送消息</label><textarea ref={input} id="chat-message" aria-label="聊天消息" rows={2} maxLength={1000} value={draft} disabled={chat.pending} onChange={event => setDraft(event.target.value)} placeholder="说点什么…" onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); void send(event) } }} /><div><small>Enter 发送 · Shift+Enter 换行</small><button type="submit" disabled={chat.pending || !draft.trim()}>发送 / 重试</button>{chat.pending && <button type="button" onClick={() => chatStore.cancel()}>停止生成</button>}</div></form>
     </section>}
   </>
 }

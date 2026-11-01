@@ -15,9 +15,10 @@
     "test:expressions": "node --experimental-strip-types --test server/tests/chat-expression.test.ts",
     "test:furniture": "node --experimental-strip-types --test server/tests/furniture.test.ts",
     "test:release": "node --experimental-strip-types --test server/tests/customization.test.ts",
+    "test:netlify": "node --experimental-strip-types --test server/tests/netlify.test.ts",
     "release:audit": "node scripts/release-audit.mjs",
     "release:prepare": "node scripts/prepare-release.mjs",
-    "test": "npm run test:character && npm run test:qwen && npm run test:actions && npm run test:expressions && npm run test:furniture && npm run test:release"
+    "test": "npm run test:character && npm run test:qwen && npm run test:actions && npm run test:expressions && npm run test:furniture && npm run test:release && npm run test:netlify"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",

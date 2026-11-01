@@ -42,11 +42,12 @@ export type StreamEvent = { event: 'delta'; data: { seq: number; text: string } 
 export class StreamingDialogue {
   private readonly config: QwenConfig
   private readonly provider?: LLMProvider
-  constructor(config = getQwenConfig(), provider?: LLMProvider) { this.config = config; this.provider = provider }
+  private readonly loader: CharacterRulesLoader
+  constructor(config = getQwenConfig(), provider?: LLMProvider, loader = new CharacterRulesLoader()) { this.config = config; this.provider = provider; this.loader = loader }
   available() { return Boolean(this.config.apiKey && this.config.enabled) }
   async *stream(value: unknown, signal: AbortSignal): AsyncGenerator<StreamEvent> {
     if (!isDialogueRequest(value)) throw new InvalidRequestError()
-    const rules = await new CharacterRulesLoader().load()
+    const rules = await this.loader.load()
     const request = { ...value, history: historyWindow(value, this.config) }
     const prompt = new CharacterPromptBuilder().build(request, rules, 'text')
     const provider = this.provider ?? (value.mode === 'demo' ? new DemoProvider() : new QwenProvider(this.config))

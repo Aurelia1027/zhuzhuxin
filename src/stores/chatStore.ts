@@ -2,6 +2,7 @@ import { recognizeLocal, parseActionPlan } from '../types/actionCommands.ts'
 import { actionBridge } from '../characters/actionBridge.ts'
 import { expressionStore } from './expressionStore.ts'
 import { normalizeExpression } from '../types/characterExpression.ts'
+import { demoReply } from '../services/dialogue/demoReply.ts'
 import { useSyncExternalStore } from 'react'
 import { defaultRelationship, initialEnvironment, isRelationshipConfig, parseDialogueResponse } from '../types/dialogue.ts'
 import type { CharacterAction, DialogueMode, EnvironmentState, RelationshipConfig, RulesMetadata } from '../types/dialogue.ts'
@@ -26,9 +27,11 @@ const listeners = new Set<() => void>()
 const service = new DemoDialogueService()
 const aiService = new AiDialogueService()
 let active: AbortController | null = null
+let manualMode = false
 function update(patch: Partial<ChatState>) { state = { ...state, ...patch }; listeners.forEach(listener => listener()) }
 export const chatStore = {
-  setMode(mode: DialogueMode) { if (!state.pending && (mode === 'ai' || mode === 'demo')) update({ mode, error: null }) },
+  setMode(mode: DialogueMode) { if (!state.pending && (mode === 'ai' || mode === 'demo')) {manualMode=true;update({ mode, error: null })} },
+  syncAvailability(available:boolean) { if(!state.pending&&!manualMode)update({mode:available?'ai':'demo'}) },
   cancel() { expressionStore.invalidateAI();active?.abort() },
   getSnapshot: () => state,
   subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener) } },
@@ -66,11 +69,15 @@ export const chatStore = {
     active = controller
     const assistantId = crypto.randomUUID()
     const timeout = setTimeout(() => controller.abort(), 185_000)
+    let fallbackReason = 'AI 或对话服务暂不可用。'
     try {
       if(!dialogue&&state.mode==='ai'){
-        const response=await fetch('/api/action-intent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'ai',message,history,relationship:{...prior.relationship},environment:{...prior.environment}}),signal:controller.signal})
-        const raw:unknown=await response.json();if(!raw||typeof raw!=='object')throw new Error('AI 回复格式无效。');const result=raw as {reply?:unknown;commands?:unknown;expression?:unknown;error?:unknown;metrics?:ChatState['apiMetrics']}
-        if(!response.ok){update({apiMetrics:result.metrics});throw new Error(typeof result.error==='string'?result.error:'AI 暂时不可用，本地动作仍可使用。')}
+        const response=await fetch('/api/action-intent',{method:'POST',headers:{'Content-Type':'application/json','X-Lumi-Request-Id':id},body:JSON.stringify({mode:'ai',message,history,relationship:{...prior.relationship},environment:{...prior.environment}}),signal:controller.signal})
+        const raw:unknown=await response.json();if(!raw||typeof raw!=='object')throw new Error('AI 回复格式无效。');const result=raw as {reply?:unknown;commands?:unknown;expression?:unknown;error?:unknown;code?:unknown;metrics?:ChatState['apiMetrics']}
+        if(!response.ok){
+          fallbackReason=result.code==='QWEN_QUOTA_EXHAUSTED'?'AI 额度已用尽或账户暂不可用。':['UPSTREAM_429','RATE_LIMITED','CONCURRENCY_LIMIT'].includes(String(result.code))?'AI 请求较多或额度受限。':result.code==='TIMEOUT'?'AI 回复超时。':result.code==='PUBLIC_AI_DISABLED'?'真实 AI 暂未开放。':fallbackReason
+          update({apiMetrics:result.metrics});throw new Error(typeof result.error==='string'?result.error:'AI 暂时不可用，本地动作仍可使用。')
+        }
         if(typeof result.reply!=='string'||result.reply.length>1200)throw new Error('AI 回复无效，未执行动作。')
         const plan=parseActionPlan({commands:result.commands});controller.signal.throwIfAborted()
         if(plan.commands.length)actionBridge.submit(plan,id)
@@ -89,6 +96,13 @@ export const chatStore = {
       if (response.mode === 'demo') publishRoomDialogueEvent({ type: 'room.environment.requested', requestId: response.requestId, environment: response.environment })
       return true
     } catch (error) {
+      if(!controller.signal.aborted&&!dialogue){
+        // No extra API request, action dispatch or expression update during fallback.
+        const fallback=demoReply({mode:'demo',message,history,relationship:prior.relationship,environment:prior.environment})
+        manualMode=true
+        update({pending:false,mode:'demo',error:fallbackReason+'已切换 Demo（预设回复）；可以稍后手动重试 AI。',messages:[...state.messages.filter(entry=>entry.id!==assistantId),{id:assistantId,role:'assistant',content:fallback.reply,mode:'demo'}]})
+        return true
+      }
       update({ pending: false, error: controller.signal.aborted ? '已停止生成，可重新发送。' : error instanceof Error ? error.message : '请求失败，请重试。', messages: state.messages.map(entry => (entry.id === id || entry.id === assistantId) ? { ...entry, failed: true } : entry) })
       return false
     } finally { clearTimeout(timeout); active = null }

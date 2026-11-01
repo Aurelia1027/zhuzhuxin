@@ -93,9 +93,10 @@ test('network failure preserves manual expression and local actions; late cancel
  const original=globalThis.fetch;chatStore.setMode('ai');expressionStore.setManual('shy')
  try{
   globalThis.fetch=async()=>{throw new Error('offline mock')}
-  assert.equal(await chatStore.send('陪我说两句吧'),false);assert.equal(expressionStore.getSnapshot().expression,'shy')
+  assert.equal(await chatStore.send('陪我说两句吧'),true);assert.equal(chatStore.getSnapshot().mode,'demo');assert.equal(expressionStore.getSnapshot().expression,'shy')
   assert.equal(await chatStore.send('挥挥手'),true)
   expressionStore.followChat()
+  chatStore.setMode('ai')
   let resolve!:(response:Response)=>void
   globalThis.fetch=async()=>new Promise<Response>(done=>{resolve=done})
   const pending=chatStore.send('这个请求稍后才会回来')

@@ -9,14 +9,15 @@ import { isDialogueRequest } from '../../src/types/dialogue.ts'
 import { parseActionOutput } from './ActionOutputProtocol.ts'
 import { recordIntentDiagnostic } from './intentDiagnostics.ts'
 export class ActionIntent {
- constructor(privateConfig=getQwenConfig(),privateProvider?:LLMProvider){this.config=privateConfig;this.provider=privateProvider}
+ constructor(privateConfig=getQwenConfig(),privateProvider?:LLMProvider,loader=new CharacterRulesLoader()){this.config=privateConfig;this.provider=privateProvider;this.loader=loader}
+ private loader:CharacterRulesLoader
  private config:ReturnType<typeof getQwenConfig>;private provider?:LLMProvider
  async respond(value:unknown,signal:AbortSignal){
   if(!isDialogueRequest(value)||value.mode!=='ai')throw new ProviderError('INVALID_REQUEST','对话请求无效。')
   const started=performance.now()
   let promptTokens:number|null=null,completionTokens:number|null=null,stage='SUCCESS',issues:{path:string;errorType:string}[]=[]
   try {
-   const rules=await new CharacterRulesLoader().load(),request={...value,history:historyWindow(value,this.config)},prompt=new CharacterPromptBuilder().build(request,rules,'action')
+   const rules=await this.loader.load(),request={...value,history:historyWindow(value,this.config)},prompt=new CharacterPromptBuilder().build(request,rules,'action')
    const guard=new DisclosureGuard([rules.content.trim(),rules.custom?.content??'',this.config.apiKey,...(rules.sections.get(10)??'').split(/\r?\n/).filter(s=>s.length>24)])
    let text=''
    for await(const chunk of (this.provider??new QwenProvider(this.config)).stream({request,prompt,signal,maxTokens:600,jsonMode:true,onUsage:usage=>{promptTokens=usage.promptTokens;completionTokens=usage.completionTokens}})){
