@@ -4,6 +4,7 @@ import type { ErrorInfo, ReactNode } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import { RoomScene } from '../scene/RoomScene'
+import { MobileChatCamera } from './chat/MobileChatCamera'
 import type { RoomSceneProps } from '../scene/RoomScene'
 
 class SceneBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -26,6 +27,7 @@ export function RoomViewport(props: RoomSceneProps) {
           gl={{ antialias: true, alpha: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.15 }} onCreated={() => setReady(true)}
           fallback={<div className="scene-message" role="alert">浏览器不支持 WebGL，请开启硬件加速或更换浏览器。</div>}>
           <Suspense fallback={null}><RoomScene {...props} /></Suspense>
+          <MobileChatCamera view={props.view} />
         </Canvas>
       </SceneBoundary>
     </div>
