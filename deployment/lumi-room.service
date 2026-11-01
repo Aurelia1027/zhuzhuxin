@@ -1,0 +1,25 @@
+[Unit]
+Description=Lumi Room same-origin dialogue API (public Demo)
+After=network.target
+
+[Service]
+Type=simple
+User=lumi
+Group=lumi
+WorkingDirectory=/srv/lumi-room/current
+EnvironmentFile=/etc/lumi-room/lumi.env
+ExecStart=/usr/bin/node --experimental-strip-types server/index.ts
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+UMask=0077
+MemoryMax=768M
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

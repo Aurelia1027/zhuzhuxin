@@ -1,0 +1,39 @@
+{
+  "name": "lumi-room",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc -b --pretty false",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:character": "node --experimental-strip-types --test server/tests/character.test.ts",
+    "serve:dialogue": "node --experimental-strip-types server/index.ts",
+    "test:qwen": "node --experimental-strip-types --test server/tests/qwen.test.ts",
+    "test:actions": "node --experimental-strip-types --test server/tests/actions.test.ts server/tests/action-output.test.ts",
+    "test:expressions": "node --experimental-strip-types --test server/tests/chat-expression.test.ts",
+    "test:furniture": "node --experimental-strip-types --test server/tests/furniture.test.ts",
+    "test:release": "node --experimental-strip-types --test server/tests/customization.test.ts",
+    "release:audit": "node scripts/release-audit.mjs",
+    "release:prepare": "node scripts/prepare-release.mjs",
+    "test": "npm run test:character && npm run test:qwen && npm run test:actions && npm run test:expressions && npm run test:furniture && npm run test:release"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
+    "ajv": "^8.20.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.12"
+  }
+}
