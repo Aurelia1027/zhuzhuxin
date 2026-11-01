@@ -1,6 +1,6 @@
 # Week 07 — Netlify Functions + Qwen 最小可用接入
 
-2026-11-01。开发分支：`feat/week07-netlify-qwen`。目标站点保持 `https://spontaneous-licorice-fbdd12.netlify.app/`。本轮没有部署生产站点，没有开启或测试真实付费请求。
+2026-11-01。开发分支：`feat/week07-netlify-qwen`。目标站点保持 `https://spontaneous-licorice-fbdd12.netlify.app/`。已通过 CLI 部署到现有生产站点，保持真实付费关闭；没有执行真实 Qwen 请求。
 
 ## 已实现
 
@@ -52,7 +52,7 @@ CLI 备选：在干净的仓库检出目录执行 `npx netlify-cli@27.16.1 login
 - `netlify-cli@27.16.1 build --offline`：通过，实际打包 lumi Function。
 - CLI `functions:serve --offline --port 9999`：真实本机请求 health 200/paidChat disabled；character 200/v0.2/aiAvailable false；Demo 200；action-intent AI 503 PUBLIC_AI_DISABLED。
 - Mock 覆盖：完整人设、单次 Qwen transport、动作及表情、AJV 拒绝未知动作、JSON/SSE 兼容、输入/Token/历史限制、三个付费入口共用实例限流、并发释放、取消、错误脱敏、429/额度错误、本地 Demo 回退；用既有 Bridge 的真实 observe 完成信号测试 Walk 后 ListenRap。
-- 原有动作、表情、家具回归测试通过。未在真实 Netlify 生产运行 Function，也未做新的真实 Qwen 或浏览器视觉验收，不将它们标为通过。
+- 原有动作、表情、家具回归测试通过。真实 Netlify 生产 Function 与浏览器 Demo/3D/鲨鱼互动验收通过；真实 Qwen 联调尚未授权执行。
 
 ## 官方参考
 
@@ -61,4 +61,18 @@ CLI 备选：在干净的仓库检出目录执行 `npx netlify-cli@27.16.1 login
 - [Netlify Function 打包配置](https://docs.netlify.com/build/functions/configuration/)
 - [百炼错误码](https://help.aliyun.com/en/model-studio/error-code)
 
-**当前生产付费状态：关闭；需要所有者填写服务端 Key、确认百炼硬停、连接现有站点并明确授权开启。**
+**当前生产付费状态：关闭。所有者已在 Netlify 配置服务端 Key，CLI 授权已完成；尚待确认百炼硬停并明确授权生产开启及一次真实联调。**
+
+## 已完成的生产部署与公网验收
+
+- 站点 ID：849a5338-c73d-47f2-a3db-d708b308af5c；未创建第二个站点。
+- 部署 ID：6ae6ede1b22f701b216e6500；[部署记录](https://app.netlify.com/projects/spontaneous-licorice-fbdd12/deploys/6ae6ede1b22f701b216e6500)。实际上传24个静态文件及1个 lumi Function。
+- [代码分支](https://github.com/Aurelia1027/zhuzhuxin/tree/feat/week07-netlify-qwen)，实现提交8f18eb12de5bfd2308ecf320d2c1adf35b594146；GitHub CI通过。main未改变。本轮采用CLI部署，不需要先连接GitHub；持续部署以后可选。
+- 最终部署产物：23个前端文件、80个Function文件；环境文件/备份/无关工作模型检查通过；已知密钥值匹配数0；官方人物原稿原始字节一致。
+- 本地Netlify打包会跟踪动态文件读取，已在included_files中显式排除.env和工作目录；未把发现过.env的初期本地产物上传。Windows部署检出关闭换行自动转换，避免人物原稿字节变化。最终采用独立普通检出目录，避免嵌套worktree的路径污染。
+- 公网GET /api/health：200，paidChat=disabled；GET /api/character：200，v0.2、aiAvailable=false，sha256与验收源文件一致。
+- 公网POST /api/dialogue（Demo）：200；POST /api/action-intent及/api/dialogue/stream（AI）：503 PUBLIC_AI_DISABLED；跨站请求403。没有调用真实Qwen。
+- 公网浏览器：3D房间、床、鞋柜、书桌、鲨鱼和猪猪心显示；角色Idle；聊天显示Demo Mode且Qwen选项禁用；“你好”收到明确标注Demo的预设回复。鲨鱼浮起交互完成；浏览器warning/error日志为空。截图保存在本地D:/pythonProject11/lumi-room-netlify-demo-live.png。
+- 25个保护文件（官方原稿、GLB、Blender工程、既有骨骼/动画/Action Bridge及家具逻辑等）哈希复核一致。
+- 本次部署使用部署级PUBLIC_QWEN_ENABLED=false覆盖。后续开启需要一次新的部署，移除该false覆盖或明确使用PUBLIC_QWEN_ENABLED=true；单改站点变量不能证明旧部署已开启。
+- 当前可以分享3D游戏及Demo；尚不能宣称完整AI聊天开放。等待所有者授权一次真实Qwen联调，通过后还须确认聊天UI标签为Qwen AI、助手消息为AI生成而非Demo。
